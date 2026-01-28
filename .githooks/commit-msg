@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# 简化的提交信息验证
+# 验证提交信息是否包含基本类型
+
+commit_regex='^(feat|fix|docs|refactor|test): .+'
+
+error_msg="❌ 提交信息格式错误！
+
+正确格式: <类型>: <描述>
+
+类型:
+  feat:     新功能
+  fix:      修复bug
+  docs:     文档更新
+  refactor: 代码重构
+  test:     测试相关
+
+示例:
+  feat: 添加向量搜索功能
+  fix: 修复分页参数问题
+  docs: 更新README文档"
+
+if ! grep -qE "$commit_regex" "$1"; then
+    echo "$error_msg" >&2
+    echo "💡 跳过检查: git commit --no-verify"
+    exit 1
+fi
+
+echo "✅ 提交信息格式正确"

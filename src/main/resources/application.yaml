@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: archimedes
+  profiles:
+    active: dev
+
+  # MySQL数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/archimedes_db?useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 1234
+
+  # Elasticsearch配置
+  elasticsearch:
+    uris: localhost:9200
+    username: elastic
+    password: changeme
+    connect-timeout: 5000
+    socket-timeout: 30000
+
+server:
+  port: 8080
+
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+  production: false
+  basic:
+    enable: false
+
+mybatis-plus:
+  type-aliases-package: com.example.archimedes.entity # 别名扫描包
+
+# 日志配置
+logging:
+  level:
+    com.example.archimedes: DEBUG

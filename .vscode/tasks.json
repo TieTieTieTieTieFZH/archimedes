@@ -1,0 +1,78 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Maven: Clean Compile",
+            "type": "shell",
+            "command": "./mvnw.cmd",
+            "args": ["clean", "compile"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "Maven: Test Compile",
+            "type": "shell",
+            "command": "./mvnw.cmd",
+            "args": ["test-compile"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "panel": "shared"
+            },
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "Maven: Test",
+            "type": "shell",
+            "command": "./mvnw.cmd",
+            "args": ["test"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "Maven: Test Single Class",
+            "type": "shell",
+            "command": "./mvnw.cmd",
+            "args": ["test", "-Dtest=${input:testClass}"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "Maven: Spring Boot Run",
+            "type": "shell",
+            "command": "./mvnw.cmd",
+            "args": ["spring-boot:run"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "new"
+            },
+            "isBackground": true
+        }
+    ],
+    "inputs": [
+        {
+            "id": "testClass",
+            "description": "Enter test class name",
+            "default": "ElasticsearchConnectionTest",
+            "type": "promptString"
+        }
+    ]
+}

@@ -1,0 +1,67 @@
+services:
+  # 1. Elasticsearch 服务
+  es-local:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: es-local
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - archimedes-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # 2. MySQL 服务  
+  mysql-local:
+    image: mysql:8.0
+    container_name: mysql-local
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: archimedes_db
+      MYSQL_USER: archimedes
+      MYSQL_PASSWORD: archimedes123
+    ports:
+      - "3306:3306"
+    volumes:
+      # 数据库初始化脚本
+      - ./docker/db/mysql:/docker-entrypoint-initdb.d
+      # 数据持久化
+      - mysql_data:/var/lib/mysql
+    networks:
+      - archimedes-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # 3. ES索引初始化服务（可选）
+  es-init:
+    image: curlimages/curl:latest
+    container_name: es-init
+    depends_on:
+      es-local:
+        condition: service_healthy
+    volumes:
+      - ./docker/db/elasticsearch:/scripts
+    networks:
+      - archimedes-network
+    command: ["/bin/sh", "/scripts/create-indices.sh"]
+    restart: "no"
+
+volumes:
+  es_data:
+    driver: local
+  mysql_data:
+    driver: local
+
+networks:
+  archimedes-network:
+    driver: bridge

@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# 简化的提交前检查
+# 两人协作版本
+
+echo "🔍 运行提交前检查..."
+
+# 1. 检查是否有暂存的变更
+if git diff --cached --quiet; then
+    echo "⚠️  没有暂存的变更，无需提交"
+    exit 1
+fi
+
+# 2. 快速编译检查
+echo "🔧 快速编译检查..."
+if ! ./mvnw.cmd compile -q -DskipTests; then
+    echo "❌ 编译失败，请修复后再提交"
+    exit 1
+fi
+
+# 3. 检查敏感信息 (可选)
+if git diff --cached --name-only | xargs grep -l "password\|secret\|key" 2>/dev/null; then
+    echo "⚠️  检测到可能的敏感信息"
+    echo "💡 跳过检查: git commit --no-verify"
+fi
+
+echo "✅ 提交前检查通过！"

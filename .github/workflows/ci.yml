@@ -1,0 +1,96 @@
+name: 🚀 简化CI流水线
+
+# 触发条件 - 仅主要分支
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # 🧪 基本测试
+  test:
+    name: 🧪 编译和测试
+    runs-on: ubuntu-latest
+    
+    services:
+      # MySQL 服务
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: 1234
+          MYSQL_DATABASE: archimedes_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      
+      # Elasticsearch 服务
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+        ports:
+          - 9200:9200
+        options: --health-cmd="curl -f http://localhost:9200/_cluster/health" --health-interval=30s --health-timeout=10s --health-retries=5
+    
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v4
+      
+    - name: ☕ 设置 JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven'
+        
+    - name: 📊 等待服务启动
+      run: |
+        echo "⏳ 等待服务启动..."
+        timeout 60 bash -c 'until curl -f http://localhost:9200/_cluster/health; do sleep 2; done'
+        timeout 60 bash -c 'until mysqladmin ping -h 127.0.0.1 --silent; do sleep 2; done'
+        echo "✅ 服务已就绪"
+    
+    - name: 🔧 编译项目
+      run: ./mvnw clean compile -DskipTests
+      
+    - name: 🧪 运行测试
+      run: ./mvnw test
+      
+    - name: 📊 生成测试报告
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: 📈 测试结果
+        path: target/surefire-reports/*.xml
+        reporter: java-junit
+
+  # 📦 构建产物 (仅主分支)
+  build:
+    name: 📦 构建JAR
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v4
+      
+    - name: ☕ 设置 JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven'
+        
+    - name: 📦 构建JAR文件
+      run: ./mvnw clean package -DskipTests
+      
+    - name: 📤 上传产物
+      uses: actions/upload-artifact@v3
+      with:
+        name: archimedes-${{ github.sha }}
+        path: target/*.jar
+        retention-days: 7

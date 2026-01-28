@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug ElasticsearchConnectionTest",
+            "request": "launch",
+            "mainClass": "",
+            "projectName": "archimedes",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "args": [],
+            "vmArgs": "",
+            "preLaunchTask": "Maven: Test Compile"
+        },
+        {
+            "type": "java",
+            "name": "Launch Archimedes Application",
+            "request": "launch",
+            "mainClass": "com.example.archimedes.ArchimedesApplication",
+            "projectName": "archimedes",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "args": [],
+            "vmArgs": ""
+        }
+    ]
+}

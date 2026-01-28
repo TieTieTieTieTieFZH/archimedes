@@ -1,0 +1,19 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "maven.executable.path": "./mvnw.cmd",
+    "maven.terminal.useJavaHome": true,
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.saveActions.organizeImports": true,
+    "files.exclude": {
+        "**/target": true
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    // Java 测试相关配置
+    "java.test.config": {
+        "workingDirectory": "${workspaceFolder}"
+    },
+    "java.test.defaultConfig": "",
+    "java.debug.settings.hotCodeReplace": "auto",
+    "java.debug.logLevel": "warn"
+}
